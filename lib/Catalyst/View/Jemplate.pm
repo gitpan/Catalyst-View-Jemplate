@@ -1,7 +1,7 @@
 package Catalyst::View::Jemplate;
 
 use strict;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use base qw( Catalyst::View );
 use File::Find::Rule;
@@ -36,7 +36,7 @@ sub process {
                                 ->in( $self->jemplate_dir );
 
     # xxx error handling?
-    my $js = Jemplate->compile_templates(@files);
+    my $js = Jemplate->compile_template_files(@files);
 
     my $encoding = $self->encoding || 'utf-8';
     if (($c->req->user_agent || '') =~ /Opera/) {
