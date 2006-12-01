@@ -1,12 +1,13 @@
 package Catalyst::View::Jemplate;
 
 use strict;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use base qw( Catalyst::View );
 use File::Find::Rule;
 use Jemplate;
 use NEXT;
+use Path::Class;
 
 __PACKAGE__->mk_accessors(qw( jemplate_dir jemplate_ext encoding ));
 
@@ -31,12 +32,50 @@ sub new {
 sub process {
     my($self, $c) = @_;
 
-    my @files = File::Find::Rule->file
-                                ->name( '*' . $self->jemplate_ext )
-                                ->in( $self->jemplate_dir );
+    my $data   = $c->stash->{jemplate};
+    my $cache  = $c->can('cache') ? $c->cache("jemplate") : undef;
+    my $output = '';
 
-    # xxx error handling?
-    my $js = Jemplate->compile_template_files(@files);
+    my $cache_key = $data->{key} || $c->req->match;
+    if ($cache) {
+        $output = $cache->get($cache_key);
+        if ($c->log->is_debug) {
+            if ($output) {
+                $c->log->debug("Catalyst::View::Jemplate cache HIT for $cache_key");
+            } else {
+                $c->log->debug("Catalyst::View::Jemplate cache MISS for $cache_key");
+            }
+        }
+    }
+
+    if (! $output) {
+        # We aren't cached, or we don't have a cache configured for us
+        my @files;
+
+        if ($data && $data->{files}) {
+            # The user can specify exactly which files we include in this
+            # particular dispatch
+            @files = 
+                map { file($self->jemplate_dir, $_) }
+                ref($data->{files}) ? @{ $data->{files} } : ($data->{files})
+            ;
+        } else {
+            # XXX - not a good idea, but leave it as final alternative
+            @files = File::Find::Rule->file
+                                     ->name( '*' . $self->jemplate_ext )
+                                     ->in( $self->jemplate_dir );
+        }
+
+        if ($c->log->is_debug) {
+            $c->log->debug("Creating Jemplate file from @files");
+        }
+
+        # xxx error handling?
+        $output = Jemplate->compile_template_files(@files);
+        if ($cache) {
+            $cache->set($cache_key, $output);
+        }
+    }
 
     my $encoding = $self->encoding || 'utf-8';
     if (($c->req->user_agent || '') =~ /Opera/) {
@@ -45,7 +84,7 @@ sub process {
         $c->res->content_type("text/javascript; charset=$encoding");
     }
 
-    $c->res->output($js);
+    $c->res->output($output || '');
 }
 
 1;
@@ -73,6 +112,32 @@ Catalyst::View::Jemplate - Jemplate files server
       my($self, $c) = @_;
       $c->forward('View::Jemplate');
   }
+
+  # To specify which files you want to include
+  sub select : Global {
+      my($self, $c) = @_;
+      $c->stash->{jemplate} = {
+          files => [ 'foo.tt', 'bar.tt' ]
+      }
+  }
+
+  # To use caching
+  use Catalyst qw(
+      ...
+      Cache
+  );
+
+  MyApp->config(
+      cache => {
+          backends => {
+              jemplate => {
+                  # Your cache backend of choice
+                  store => "FastMmap",
+              }
+          }
+      }
+  );
+     
 
 =head1 DESCRIPTION
 

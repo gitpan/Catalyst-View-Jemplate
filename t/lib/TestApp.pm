@@ -26,4 +26,13 @@ sub finalize_error {
     $c->NEXT::finalize_error;
 }
 
+sub selected : Global {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{jemplate} = {
+        files => 'bar.tt'
+    };
+    $c->forward('View::Jemplate');
+}
+
 1;

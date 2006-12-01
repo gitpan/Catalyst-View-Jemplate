@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::View::Jemplate
 
+0.03  Fri Dec  1 02:16:38 PST 2006
+        - Added caching and the ability to specify which file to jemplatize
+        - Added Helper Catalyst::Helper::View::Jemplate
+
 0.02  Fri Apr 28 03:39:16 JST 2006
         - Updated to Jemplate new API
           (Thanks to Fujiwara Shuichiro)
