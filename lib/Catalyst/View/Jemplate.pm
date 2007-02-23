@@ -1,7 +1,7 @@
 package Catalyst::View::Jemplate;
 
 use strict;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use base qw( Catalyst::View );
 use File::Find::Rule;
@@ -70,8 +70,13 @@ sub process {
             $c->log->debug("Creating Jemplate file from @files");
         }
 
+        # add runtime
+        if ($data && $data->{runtime}) {
+            $output = Jemplate->runtime_source_code();
+        }
+
         # xxx error handling?
-        $output = Jemplate->compile_template_files(@files);
+        $output .= Jemplate->compile_template_files(@files);
         if ($cache) {
             $cache->set($cache_key, $output);
         }
@@ -118,6 +123,15 @@ Catalyst::View::Jemplate - Jemplate files server
       my($self, $c) = @_;
       $c->stash->{jemplate} = {
           files => [ 'foo.tt', 'bar.tt' ]
+      }
+  }
+
+  # To serve Jemplate rutime
+  sub runtime : Path('Jemplate.js') {
+      my($self, $c) = @_;
+      $c->stash->{jemplate} = {
+          runtime => 1,
+          files   => [],  # runtime only
       }
   }
 

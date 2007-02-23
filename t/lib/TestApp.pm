@@ -35,4 +35,14 @@ sub selected : Global {
     $c->forward('View::Jemplate');
 }
 
+sub runtime : Path('Jemplate.js') {
+    my ( $self, $c ) = @_;
+
+    $c->stash->{jemplate} = {
+        runtime => 1,
+        files   => [],
+    };
+    $c->forward('View::Jemplate');
+}
+
 1;

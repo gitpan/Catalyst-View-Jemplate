@@ -4,7 +4,7 @@ WriteMakefile(
     'VERSION_FROM' => 'lib/Catalyst/View/Jemplate.pm', # finds $VERSION
     'PREREQ_PM' => {
 	Test::More => 0.32,
-        Jemplate => 0.18,
+        Jemplate => 0.19,
         Catalyst => 5.50,
         File::Find::Rule => 0,
     },
