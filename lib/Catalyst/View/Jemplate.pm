@@ -1,7 +1,7 @@
 package Catalyst::View::Jemplate;
 
 use strict;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use base qw( Catalyst::View );
 use File::Find::Rule;
@@ -33,7 +33,9 @@ sub process {
     my($self, $c) = @_;
 
     my $data   = $c->stash->{jemplate};
-    my $cache  = $c->can('cache') ? $c->cache("jemplate") : undef;
+    my $cache  = $c->can('curry_cache') ? $c->cache("jemplate")
+               : $c->can('cache')       ? $c->cache
+               :                          undef;
     my $output = '';
 
     my $cache_key = $data->{key} || $c->req->match;
