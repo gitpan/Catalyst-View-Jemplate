@@ -1,7 +1,7 @@
 package Catalyst::View::Jemplate;
 
 use strict;
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use base qw( Catalyst::View );
 use File::Find::Rule;
@@ -153,7 +153,6 @@ Catalyst::View::Jemplate - Jemplate files server
           }
       }
   );
-     
 
 =head1 DESCRIPTION
 
@@ -166,14 +165,12 @@ include the file via Catalyst app like:
   <script src="js/Jemplate.js" type="text/javascript"></script>
   <script src="/jemplate/all.js" type="text/javascript"></script>
 
+When L<Catalyst::Plugin::Cache> is enabled, this plugin make uses of
+it to cache the compiled output and serve files.
+
 =head1 TODO
 
 =over 4
-
-=item *
-
-Yeah, we definitely need a cache. For now it compiles templates in
-every request, which is not very efficient.
 
 =item *
 

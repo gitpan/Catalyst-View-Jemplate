@@ -1,5 +1,9 @@
 Revision history for Perl extension Catalyst::View::Jemplate
 
+0.06  Fri May  4 15:16:09 PDT 2007
+        - Document update to remove TODO for caching
+          (Thanks to nothingmuch)
+
 0.05  Tue May  1 00:11:30 PDT 2007
         - Fixed cache to work with new Catalyst::Plugin::Cache modules
           (Thanks to Takeda Akihito)
